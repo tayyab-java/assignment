@@ -4,6 +4,7 @@ metadata:
   name: sample-app-hostnetwork
   annotations:
     pod-policies.kyverno.io/autogen-controllers: "none"
+    policies.kyverno.io/mutate-existing: "true"
 spec:
   rules:
     - name: enable-hostnetwork
@@ -11,17 +12,14 @@ spec:
         any:
           - resources:
               kinds:
-                - Deployment
+                - Pod
               namespaces:
                 - sample-app
-              names:
-                - sample-app
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: sample-app
       mutate:
         patchStrategicMerge:
           spec:
-            strategy:
-              type: Recreate
-            template:
-              spec:
-                hostNetwork: true
-                dnsPolicy: ClusterFirstWithHostNet
+            hostNetwork: true
+            dnsPolicy: ClusterFirstWithHostNet

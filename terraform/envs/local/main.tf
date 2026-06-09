@@ -108,6 +108,7 @@ resource "kubectl_manifest" "root_application" {
 
   depends_on = [
     helm_release.argocd,
+    helm_release.kyverno,
     kubectl_manifest.project_root,
     module.sample_app_project,
   ]

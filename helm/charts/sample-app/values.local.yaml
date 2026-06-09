@@ -1,6 +1,6 @@
 envFromSecret: sample-app-env
 
-# whoami binds to port 80 as non-root; NET_BIND_SERVICE is required when capabilities.drop: [ALL].
+# whoami needs NET_BIND_SERVICE when capabilities.drop includes ALL (chart default).
 securityContext:
   runAsNonRoot: true
   runAsUser: 65532

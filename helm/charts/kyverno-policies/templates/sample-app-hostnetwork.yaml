@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: sample-app-hostnetwork
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: "none"
+spec:
+  rules:
+    - name: enable-hostnetwork
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+              namespaces:
+                - sample-app
+              names:
+                - sample-app
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                hostNetwork: true
+                dnsPolicy: ClusterFirstWithHostNet

@@ -1,13 +1,6 @@
 envFromSecret: sample-app-env
 
-# whoami needs NET_BIND_SERVICE when capabilities.drop includes ALL (chart default).
 securityContext:
-  runAsNonRoot: true
-  runAsUser: 65532
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
   capabilities:
-    drop:
-      - ALL
     add:
       - NET_BIND_SERVICE

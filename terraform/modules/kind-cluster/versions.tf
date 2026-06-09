@@ -6,5 +6,9 @@ terraform {
       source  = "tehcyx/kind"
       version = "0.7.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.3"
+    }
   }
 }

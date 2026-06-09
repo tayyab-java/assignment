@@ -19,3 +19,11 @@ resource "kind_cluster" "this" {
     }
   }
 }
+
+resource "null_resource" "unprivileged_ports" {
+  depends_on = [kind_cluster.this]
+
+  provisioner "local-exec" {
+    command = "docker exec ${var.cluster_name}-control-plane sysctl -w net.ipv4.ip_unprivileged_port_start=0"
+  }
+}

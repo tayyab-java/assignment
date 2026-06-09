@@ -101,7 +101,7 @@ resource "kubectl_manifest" "project_root" {
 
 resource "kubectl_manifest" "root_application" {
   yaml_body = replace(
-    file("${path.module}/../../../argocd/root.yaml"),
+    file("${path.module}/../../../argocd/root-stage.yaml"),
     "<YOUR_GIT_REPO_URL>",
     var.git_repo_url
   )

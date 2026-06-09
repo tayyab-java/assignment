@@ -11,7 +11,7 @@ spec:
     path: argocd/apps
     directory:
       recurse: false
-      include: "{sample-app,kyverno-policies}.yaml"
+      include: "{sample-app-stage,kyverno-policies}.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

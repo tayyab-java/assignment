@@ -1,0 +1,69 @@
+name: terraform-plan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env:
+          - terraform/envs/local
+          - terraform/envs/local-stage
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Install tools
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          CONFTEST_VER=0.56.0
+          curl -sL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VER}/conftest_${CONFTEST_VER}_Linux_x86_64.tar.gz" | sudo tar xz -C /usr/local/bin conftest
+          pip install checkov
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive terraform/
+
+      - name: Bootstrap backend config
+        run: |
+          if [ -f "${{ matrix.env }}/backend.hcl.example" ] && [ ! -f "${{ matrix.env }}/backend.hcl" ]; then
+            cp "${{ matrix.env }}/backend.hcl.example" "${{ matrix.env }}/backend.hcl"
+          fi
+          if [ -f "${{ matrix.env }}/terraform.tfvars.example" ] && [ ! -f "${{ matrix.env }}/terraform.tfvars" ]; then
+            cp "${{ matrix.env }}/terraform.tfvars.example" "${{ matrix.env }}/terraform.tfvars"
+          fi
+
+      - name: Terraform init
+        working-directory: ${{ matrix.env }}
+        run: terraform init -backend-config=backend.hcl
+
+      - name: Terraform validate
+        working-directory: ${{ matrix.env }}
+        run: terraform validate
+
+      - name: TFLint
+        working-directory: ${{ matrix.env }}
+        run: tflint --init && tflint
+
+      - name: Terraform plan
+        if: matrix.env == 'terraform/envs/local'
+        working-directory: ${{ matrix.env }}
+        run: terraform plan -out=tfplan
+
+      - name: Conftest plan
+        if: matrix.env == 'terraform/envs/local'
+        working-directory: ${{ matrix.env }}
+        run: terraform show -json tfplan | conftest test --policy ../../../verify/policies/terraform/ -
+
+      - name: Checkov
+        if: matrix.env == 'terraform/envs/local'
+        run: |
+          checkov -d terraform/ --quiet --compact --soft-fail-on LOW,MEDIUM \
+            --skip-check CKV_TF_1,CKV_TF_2

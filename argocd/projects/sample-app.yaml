@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: sample-app
+  namespace: argocd
+spec:
+  sourceRepos:
+    - https://github.com/tayyab-java/assignment.git
+  destinations:
+    - namespace: sample-app
+      server: https://kubernetes.default.svc
+    - namespace: sample-app-stage
+      server: https://kubernetes.default.svc
+    - namespace: kyverno
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

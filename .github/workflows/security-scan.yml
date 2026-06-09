@@ -1,0 +1,23 @@
+name: security-scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy image scan
+        run: |
+          docker run --rm aquasec/trivy:0.58.1 image traefik/whoami:v1.10.4 \
+            --severity HIGH,CRITICAL --format json > trivy-report.json || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json

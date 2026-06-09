@@ -1,0 +1,4 @@
+cluster_name   = "devops-local"
+node_count     = 1
+git_repo_url   = "https://github.com/tayyab-java/assignment.git"
+kubeconfig_dir = "../../../devops-local.kubeconfig"

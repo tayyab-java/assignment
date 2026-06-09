@@ -1,0 +1,33 @@
+name: policy-test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          CONFTEST_VER=0.56.0
+          curl -sL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VER}/conftest_${CONFTEST_VER}_Linux_x86_64.tar.gz" | sudo tar xz -C /usr/local/bin conftest
+
+      - name: Conftest ArgoCD apps
+        run: conftest test --policy verify/policies/argocd/ argocd/apps/*.yaml
+
+      - name: Helm lint and conftest
+        run: |
+          for chart in helm/charts/*; do
+            helm lint "$chart"
+            if [ -f "$chart/values.local.yaml" ]; then
+              helm template sample-app "$chart" --values "$chart/values.local.yaml" | conftest test --policy verify/policies/helm/ -
+            else
+              helm template sample-app "$chart" | conftest test --policy verify/policies/helm/ -
+            fi
+          done

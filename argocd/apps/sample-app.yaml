@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sample-app
+  namespace: argocd
+spec:
+  project: sample-app
+  source:
+    repoURL: https://github.com/tayyab-java/assignment.git
+    targetRevision: main
+    path: helm/charts/sample-app
+    helm:
+      valueFiles:
+        - values.local.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sample-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

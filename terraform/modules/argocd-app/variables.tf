@@ -23,6 +23,12 @@ variable "target_namespace" {
   type        = string
 }
 
+variable "destination_namespaces" {
+  description = "Namespaces allowed in the AppProject"
+  type        = list(string)
+  default     = []
+}
+
 variable "source_path" {
   description = "Path within the repository"
   type        = string

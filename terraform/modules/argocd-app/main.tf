@@ -4,6 +4,8 @@ locals {
       valueFiles = var.helm_value_files
     }
   } : {}
+
+  allowed_namespaces = length(var.destination_namespaces) > 0 ? var.destination_namespaces : [var.target_namespace]
 }
 
 resource "kubectl_manifest" "project" {
@@ -18,10 +20,12 @@ resource "kubectl_manifest" "project" {
     }
     spec = {
       sourceRepos = [var.repo_url]
-      destinations = [{
-        namespace = var.target_namespace
-        server    = "https://kubernetes.default.svc"
-      }]
+      destinations = [
+        for ns in local.allowed_namespaces : {
+          namespace = ns
+          server    = "https://kubernetes.default.svc"
+        }
+      ]
       clusterResourceWhitelist = [{
         group = "*"
         kind  = "*"

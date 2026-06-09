@@ -22,25 +22,13 @@ spec:
                 - kyverno
       validate:
         message: "Using the ':latest' tag is not allowed."
-        pattern:
-          spec:
-            containers:
-              - image: "!*:latest"
-    - name: require-image-tag
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - kyverno
-      validate:
-        message: "Image must include an explicit tag."
-        pattern:
-          spec:
-            containers:
-              - image: "*:*"
+        deny:
+          conditions:
+            any:
+              - key: "{{ images.containers.*.tag[] }}"
+                operator: Equals
+                value:
+                  - latest
+              - key: "{{ images.containers.*.tag[] | length(@) }}"
+                operator: Equals
+                value: 0

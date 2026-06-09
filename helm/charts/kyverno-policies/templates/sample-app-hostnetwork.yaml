@@ -19,6 +19,8 @@ spec:
       mutate:
         patchStrategicMerge:
           spec:
+            strategy:
+              type: Recreate
             template:
               spec:
                 hostNetwork: true

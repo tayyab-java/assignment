@@ -77,16 +77,16 @@ resource "helm_release" "kyverno" {
 module "stage_app_project" {
   source = "../../modules/argocd-app"
 
-  app_name             = "sample-app-stage"
-  project_name         = "sample-app"
-  repo_url             = var.git_repo_url
-  target_namespace        = "sample-app-stage"
-  destination_namespaces  = ["sample-app", "sample-app-stage", "kyverno"]
-  source_path             = "helm/charts/sample-app"
-  helm_value_files     = ["values.local-stage.yaml"]
-  sync_options         = ["CreateNamespace=true", "ServerSideApply=true"]
-  create_application   = false
-  depends_on_resources = [helm_release.argocd]
+  app_name               = "sample-app-stage"
+  project_name           = "sample-app"
+  repo_url               = var.git_repo_url
+  target_namespace       = "sample-app-stage"
+  destination_namespaces = ["sample-app", "sample-app-stage", "kyverno"]
+  source_path            = "helm/charts/sample-app"
+  helm_value_files       = ["values.local-stage.yaml"]
+  sync_options           = ["CreateNamespace=true", "ServerSideApply=true"]
+  create_application     = false
+  depends_on_resources   = [helm_release.argocd]
 }
 
 resource "kubectl_manifest" "project_root" {

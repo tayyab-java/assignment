@@ -15,6 +15,7 @@ spec:
                 - Pod
               namespaces:
                 - sample-app
+                - sample-app-stage
               selector:
                 matchLabels:
                   app.kubernetes.io/name: sample-app
